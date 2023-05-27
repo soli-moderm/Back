@@ -1,0 +1,124 @@
+const express = require('express');
+const faker = require('faker');
+const passport = require('passport');
+
+const CategoryService = require('../services/category.service');
+const validatorHandler = require('../middlewares/validator.handler');
+const { checkRoles } = require('./../middlewares/auth.handler');
+const {
+  createCategorySchema,
+  updateCategorySchema,
+  getCategorySchema,
+} = require('../schemas/category.schema');
+const upload = require('../utils/multer');
+
+const router = express.Router();
+const service = new CategoryService();
+
+router.get(
+  '/',
+  // passport.authenticate('jwt', {session: false}),
+  // //Verifica que se un password firmado por nosotros
+  // checkRoles('admin', 'seller', 'customer'),
+  //verifica que tenga un de los roles indicados
+  async (req, res, next) => {
+    try {
+      const query = req.query;
+      const categories = await service.find(query);
+      res.json(categories);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+router.get(
+  '/allList',
+  // passport.authenticate('jwt', {session: false}),
+  // //Verifica que se un password firmado por nosotros
+  // checkRoles('admin', 'seller', 'customer'),
+  //verifica que tenga un de los roles indicados
+  async (req, res, next) => {
+    try {
+      const categories = await service.allList();
+      res.json(categories);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+router.get(
+  '/:id',
+  passport.authenticate('jwt', { session: false }),
+  checkRoles('admin', 'seller', 'customer'),
+  validatorHandler(getCategorySchema, 'params'),
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const category = await service.findOne(id);
+      res.json(category);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+router.post(
+  '/',
+  // passport.authenticate('jwt', {session: false}),
+  // checkRoles('admin'),
+
+  validatorHandler(createCategorySchema, 'body'),
+  async (req, res, next) => {
+    try {
+      const body = req.body;
+      console.log(
+        '🚀 ~ file: categories.router.js ~ line 60 ~ req.body',
+        req.body
+      );
+      const newCategory = await service.create(body);
+      res.status(201).json(newCategory);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+router.patch(
+  '/:id',
+  // passport.authenticate('jwt', {session: false}),
+  // checkRoles('admin', 'seller'),
+  upload.array('files'),
+  validatorHandler(getCategorySchema, 'params'),
+  validatorHandler(updateCategorySchema, 'body'),
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const body = req.body;
+      const files = req.files;
+      const category = await service.update(id, { body, files });
+      res.json(category);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+router.delete(
+  '/:id',
+  // passport.authenticate('jwt', { session: false }),
+  // checkRoles('admin', 'seller'),
+  validatorHandler(getCategorySchema, 'params'),
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      await service.delete(id);
+      res.status(201).json({ id: Number(id) });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+module.exports = router;
