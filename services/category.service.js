@@ -47,26 +47,26 @@ class CategoryService {
     return category;
   }
 
-  async update(id, { body, files }) {
-    const results = await Promise.all(
-      files.map(async (file) => {
-        try {
-          const result = await uploadFile(file);
-          await unlinkFile(file.path);
-          return result;
-        } catch (error) {
-          return error;
-        }
-      })
-    );
+  async update(id, { body }) {
+    // const results = await Promise.all(
+    //   files.map(async (file) => {
+    //     try {
+    //       const result = await uploadFile(file);
+    //       await unlinkFile(file.path);
+    //       return result;
+    //     } catch (error) {
+    //       return error;
+    //     }
+    //   })
+    // );
 
-    const idImages = results.map((image) => image.key);
+    // const idImages = results.map((image) => image.key);
 
     const category = await models.Category.findByPk(id);
 
     const rta = await category.update({
       name: body.name,
-      image: idImages[0],
+      image: body.file,
     });
 
     return rta;

@@ -31,6 +31,8 @@ router.get(
   }
 );
 
+
+
 router.get(
   '/:id',
   validatorHandler(getProductSchema, 'params'),

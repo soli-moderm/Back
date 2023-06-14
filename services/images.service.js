@@ -6,7 +6,6 @@ const { uploadFile, getFileStream, getBuckets } = require('../utils/s3');
 const fs = require('fs');
 const util = require('util');
 const unlinkFile = util.promisify(fs.unlink);
-
 class ImagesService {
   async uploadImages({ files }) {
     console.log(
@@ -39,4 +38,5 @@ class ImagesService {
   }
 }
 
-module.exports = ImagesService;
+module.exports =
+ ImagesService;

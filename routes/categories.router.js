@@ -89,15 +89,15 @@ router.patch(
   '/:id',
   // passport.authenticate('jwt', {session: false}),
   // checkRoles('admin', 'seller'),
-  upload.array('files'),
+  // upload.array('files'),
   validatorHandler(getCategorySchema, 'params'),
   validatorHandler(updateCategorySchema, 'body'),
   async (req, res, next) => {
     try {
       const { id } = req.params;
       const body = req.body;
-      const files = req.files;
-      const category = await service.update(id, { body, files });
+      // const files = req.files;
+      const category = await service.update(id, { body });
       res.json(category);
     } catch (error) {
       next(error);
