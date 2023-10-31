@@ -5,9 +5,10 @@ const { Op } = require('sequelize');
 const conekta = require('conekta');
 const { config } = require('../config/config');
 
-const typeStatusOrder = require('../utils/typeStatusOrder');
+const { typeStatusOrder } = require('../utils/typeStatus');
 const { Coupon } = require('../db/models/coupon.model');
 const paginate = require('../utils/paginate');
+const { application } = require('express');
 
 const stripe = require('stripe')(config.stripePrivateKey);
 
@@ -138,7 +139,7 @@ class OrderService {
     );
 
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: totalAamount * 100,
+      amount: Math.trunc(totalAamount) * 100,
       currency: 'mxn',
       automatic_payment_methods: {
         enabled: true,
@@ -182,6 +183,15 @@ class OrderService {
     console.log(
       '🚀 ~ file: order.service.js:92 ~ OrderService ~ create ~ newOrder',
       newOrder
+    );
+
+    const newStatus = await models.OrderStatusHistory.create({
+      orderId: newOrder.id,
+      status: typeStatusOrder.ESPERANDO_CONFIRMACION_DE_PAGO,
+    }).catch((error) => boom.badRequest(error));
+    console.log(
+      '🚀 ~ file: order.service.js:191 ~ OrderService ~ create ~ newStatus:',
+      newStatus
     );
 
     const productsForOrder = data?.cartList.map((item) => {
@@ -346,12 +356,21 @@ class OrderService {
           as: 'address',
         },
         {
+          association: 'customer',
+          as: 'customer',
+          include: {
+            model: models.User,
+            as: 'user',
+            attributes: ['id', 'email'],
+          },
+        },
+        {
           association: 'orderProducts',
           include: [
             {
               association: 'product',
               as: 'product',
-              include:{
+              include: {
                 model: models.Product_images,
                 as: 'product_images',
                 attributes: ['filename'],
@@ -377,6 +396,75 @@ class OrderService {
 
   async delete(id) {
     return { id };
+  }
+
+  async applicationOrderCoupon(data) {
+    const { orderId, couponId } = data;
+    const order = await models.Order.findByPk(orderId).catch((error) =>
+      boom.badRequest(error)
+    );
+    const coupon = await models.Coupon.findAll({
+      where: {
+        name: couponId,
+      },
+    }).catch((error) => boom.badRequest(error));
+
+    if (order.isCouponApplied) {
+      return boom.badRequest('Tiene un cupón aplicado');
+    }
+
+    if (coupon.length === 0) {
+      return boom.badRequest('Cupón no encontrado');
+    }
+
+    if (coupon[0].startDate > new Date()) {
+      return boom.badRequest('Cupón no disponible');
+    }
+
+    if (coupon[0].status === 'INACTIVO') {
+      return boom.badRequest('Cupón no disponible');
+    }
+
+    if (coupon[0].endDate < new Date()) {
+      return boom.badRequest('Cupón expirado');
+    }
+
+    if (coupon[0].usageLimit <= coupon[0].timesUsed) {
+      return boom.badRequest('Cupón expirado');
+    }
+
+    if (coupon[0].minimumPurchase > order.totalAmount) {
+      return boom.badRequest('El monton minimo de compra no se ha alcanzado');
+    }
+
+    let totalAmountWithDiscount = 0;
+
+    if (coupon[0].type === 'MONTO') {
+      totalAmountWithDiscount = order.totalAmount - coupon[0].discount;
+    } else {
+      const discount = (order.totalAmount * coupon[0].discount) / 100;
+      if (discount > coupon[0].maximumDiscount) {
+        totalAmountWithDiscount = order.totalAmount - coupon[0].maximumDiscount;
+      } else {
+        totalAmountWithDiscount = order.totalAmount - discount;
+      }
+    }
+
+    const newOrder = order.update({
+      isCouponApplied: true,
+      totalAmountWithDiscount,
+      discountAmount: order.totalAmount - totalAmountWithDiscount,
+      couponId: coupon[0].id,
+    });
+
+    const newCoupon = coupon[0].update({
+      timesUsed: coupon[0].timesUsed + 1,
+    });
+
+    return {
+      order: newOrder,
+      coupon: newCoupon,
+    };
   }
 }
 

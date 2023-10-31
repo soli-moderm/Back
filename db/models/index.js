@@ -8,6 +8,11 @@ const {
   OrderPayment,
   OrderPaymentSchema,
 } = require('./order-payment-details.model');
+
+const {
+  OrderStatusHistory,
+  OrderStatusHistorySchema,
+} = require('./order-status-history.model');
 const { Coupon, CouponSchema } = require('./coupon.model');
 const {
   CustomerAddress,
@@ -44,7 +49,10 @@ function setupModels(sequelize) {
   Order.init(OrderSchema, Order.config(sequelize));
   OrderProduct.init(OrderProductSchema, OrderProduct.config(sequelize));
   OrderPayment.init(OrderPaymentSchema, OrderPayment.config(sequelize));
-
+  OrderStatusHistory.init(
+    OrderStatusHistorySchema,
+    OrderStatusHistory.config(sequelize)
+  );
   Customer_Payment.init(
     CustomerPaymentSchema,
     Customer_Payment.config(sequelize)
@@ -64,6 +72,7 @@ function setupModels(sequelize) {
   CustomerAddress.associate(sequelize.models);
   Order.associate(sequelize.models);
   OrderPayment.associate(sequelize.models);
+  OrderStatusHistory.associate(sequelize.models);
   OrderProduct.associate(sequelize.models);
   Coupon.associate(sequelize.models);
   Customer_Payment.associate(sequelize.models);

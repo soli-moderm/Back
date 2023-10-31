@@ -23,8 +23,18 @@ const CouponSchema = {
   },
   discount: {
     allowNull: false,
-    type: DataTypes.STRING,
+    type: DataTypes.FLOAT,
     field: 'discount',
+  },
+  usageLimit:{
+    allowNull: true,
+    type: DataTypes.INTEGER,
+    field: 'usage_limit',
+  },
+  timesUsed: {
+    allowNull: true,
+    type: DataTypes.INTEGER,
+    field: 'times_used',
   },
   startDate: {
     allowNull: false,
@@ -37,12 +47,12 @@ const CouponSchema = {
     field: 'end_date',
   },
   minimumPurchase: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.FLOAT,
     field: 'minimum_purchase',
     allowNull: true,
   },
   maximumDiscount: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.FLOAT,
     field: 'maximumDiscount',
     allowNull: true,
   },

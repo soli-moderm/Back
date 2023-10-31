@@ -19,6 +19,10 @@ const {
   ORDER_PAYMENT_TABLE,
   OrderPaymentSchema,
 } = require('./../models/order-payment-details.model');
+const {
+  OrderStatusHistorySchema,
+  ORDER_STATUS_HISTORY_TABLE,
+} = require('./../models/order-status-history.model');
 const { CouponSchema, COUPON_TABLE } = require('../models/coupon.model');
 const {
   CustomerAddressSchema,
@@ -70,6 +74,10 @@ module.exports = {
       CUSTOMER_PAYMENT_TABLE,
       CustomerPaymentSchema
     );
+    await queryInterface.createTable(
+      ORDER_STATUS_HISTORY_TABLE,
+      OrderStatusHistorySchema
+    );
 
     await queryInterface.createTable(DISCOUNT_TABLE, DiscountSchema);
     await queryInterface.createTable(
@@ -87,6 +95,7 @@ module.exports = {
     await queryInterface.dropTable(CUSTOMER_PAYMENT_TABLE);
 
     await queryInterface.dropTable(ORDER_PAYMENT_TABLE);
+    await queryInterface.dropTable(ORDER_STATUS_HISTORY_TABLE);
     await queryInterface.dropTable(ORDER_PRODUCT_TABLE);
     await queryInterface.dropTable(CUSTOMER_ADDRESS_TABLE);
     await queryInterface.dropTable(COUPON_TABLE);

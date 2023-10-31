@@ -6,7 +6,17 @@ const typeStatusOrder = {
   LISTA_PARA_ENVIAR: 'Lista para enviar',
   PEDIDO_EN_CAMINO: 'Pedido en camino',
   PAGADA_Y_ENVIADA: 'Pagada y enviada',
-  CANCELADA: 'Cancelada'
+  ENTREGADA: 'Entregada',
+  DEVUELTA: 'Devuelta',
+  CANCELADA: 'Cancelada',
+  DELETE: 'Delete',
+
 };
 
-module.exports = typeStatusOrder;
+const typeStatusCoupon = {
+  ACTIVO: 'ACTIVO',
+  INACTIVO: 'INACTIVO',
+  DELETE: 'DELETE',
+};
+
+module.exports = { typeStatusOrder, typeStatusCoupon };

@@ -10,6 +10,7 @@ const {
   createOrderSchema,
   addItemSchema,
 } = require('../schemas/order.schema');
+const sedResponseSuccess = require('../utils/response');
 
 const router = express.Router();
 const service = new OrderService();
@@ -127,5 +128,16 @@ router.post(
     }
   }
 );
+
+//applicationOrderCoupon
+router.post('/applicationOrderCoupon', async (req, res, next) => {
+  try {
+    const body = req.body;
+    const newItem = await service.applicationOrderCoupon(body);
+    sedResponseSuccess(res, newItem, 'Coupon Aplicado', 201);
+  } catch (error) {
+    next(error);
+  }
+});
 
 module.exports = router;

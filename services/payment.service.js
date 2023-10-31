@@ -4,7 +4,7 @@ const { models } = require('../libs/sequelize');
 
 const { config } = require('../config/config');
 
-const typeStatusOrder = require('../utils/typeStatusOrder');
+const { typeStatusOrder } = require('../utils/typeStatus');
 
 const stripe = require('stripe')(config.stripePrivateKey);
 
@@ -46,6 +46,15 @@ class paymentService {
           }
         ).catch((error) => boom.badRequest(error));
 
+        const newStatus = await models.OrderStatusHistory.create({
+          orderId: order[0].id,
+          status: typeStatusOrder.PAGADA,
+        }).catch((error) => boom.badRequest(error));
+        console.log(
+          '🚀 ~ file: payment.service.js:57 ~ paymentService ~ paymentSucceeded ~ newStatus:',
+          newStatus
+        );
+
         return orderUpdate;
       }
     }
@@ -85,6 +94,15 @@ class paymentService {
           }
         ).catch((error) => boom.badRequest(error));
 
+        const newStatus = await models.OrderStatusHistory.create({
+          orderId: order[0].id,
+          status: typeStatusOrder.PAGO_REQUIERE_ACCION,
+        }).catch((error) => boom.badRequest(error));
+        console.log(
+          '🚀 ~ file: payment.service.js:101 ~ paymentService ~ paymentRequiresAction ~ newStatus:',
+          newStatus
+        );
+
         return orderUpdate;
       }
     }
@@ -123,6 +141,15 @@ class paymentService {
             where: { id: order[0].id },
           }
         ).catch((error) => boom.badRequest(error));
+
+        const newStatus = await models.OrderStatusHistory.create({
+          orderId: order[0].id,
+          status: typeStatusOrder.PAGO_RECHAZADO,
+        }).catch((error) => boom.badRequest(error));
+        console.log(
+          '🚀 ~ file: payment.service.js:149 ~ paymentService ~ paymentFailed ~ newStatus:',
+          newStatus
+        );
 
         return orderUpdate;
       }

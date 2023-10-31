@@ -42,6 +42,11 @@ class User extends Model {
       as: 'customer',
       foreignKey: 'userId'
     });
+  this.hasOne(models.OrderStatusHistory,{
+      as: 'orderStatusHistory',
+      foreignKey: 'userId'
+    });
+
   }
 
   static config(sequelize) {

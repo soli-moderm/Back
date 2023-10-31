@@ -95,7 +95,7 @@ class ProductsService {
       options.limit = limit;
       options.offset = offset;
     }
- const { price } = query;
+    const { price } = query;
     if (price) {
       options.where.price = price;
     }
@@ -116,6 +116,42 @@ class ProductsService {
     const count = await models.Product.count();
 
     return { data: products, count };
+  }
+
+  async findProductsBestSellers() {
+    const options = {
+      include: [
+        {
+          model: models.Category,
+          as: 'category',
+          attributes: ['id'],
+        },
+        {
+          model: models.Product_images,
+          as: 'product_images',
+          attributes: ['filename'],
+        },
+        {
+          model: models.Product_variant,
+          as: 'product_variant',
+          attributes: [
+            'id',
+            'name',
+            'price',
+            'promotionalPrice',
+            'stock',
+            'status',
+          ],
+        },
+      ],
+      where: {
+        id: [1, 9, 10, 11, 5, 15, 12],
+      },
+    };
+
+    const products = await models.Product.findAll(options);
+
+    return products;
   }
 
   async findOne(id) {

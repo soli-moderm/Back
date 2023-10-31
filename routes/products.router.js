@@ -10,13 +10,23 @@ const {
   deleteProductSchema,
   getProductSchemaCategory,
   getProductSearchProduct,
-  getProductSchemaSimilarProductsByCategory
+  getProductSchemaSimilarProductsByCategory,
 } = require('./../schemas/product.schema');
 
 const router = express.Router();
 const service = new ProductsService();
 const { uploadFile, getFileStream, getBuckets } = require('../utils/s3');
 const upload = require('../utils/multer');
+
+// Returns the list of products marked as best sellers
+router.get('/productsBestSellers', async (req, res, next) => {
+  try {
+    const products = await service.findProductsBestSellers(req.query);
+    res.json(products);
+  } catch (error) {
+    next(error);
+  }
+});
 
 router.get(
   '/',
@@ -30,8 +40,6 @@ router.get(
     }
   }
 );
-
-
 
 router.get(
   '/:id',
@@ -51,7 +59,7 @@ router.get(
   '/category/:categoryName',
   validatorHandler(getProductSchemaCategory, 'params'),
   async (req, res, next) => {
-    const { categoryName }=req.params;
+    const { categoryName } = req.params;
     try {
       const product = await service.getByCategory(req.query, categoryName);
       res.json(product);
@@ -65,9 +73,12 @@ router.get(
   '/similarProductsByCategory/:Idcategory',
   validatorHandler(getProductSchemaSimilarProductsByCategory, 'params'),
   async (req, res, next) => {
-    const { Idcategory }=req.params;
+    const { Idcategory } = req.params;
     try {
-      const product = await service.getSimilarProductsByCategory(req.query, Idcategory);
+      const product = await service.getSimilarProductsByCategory(
+        req.query,
+        Idcategory
+      );
       res.json(product);
     } catch (error) {
       next(error);
@@ -79,7 +90,7 @@ router.get(
   '/searchProduct/:searchString',
   validatorHandler(getProductSearchProduct, 'params'),
   async (req, res, next) => {
-    const { searchString }=req.params;
+    const { searchString } = req.params;
     try {
       const product = await service.searchProduct(req.query, searchString);
       res.json(product);
@@ -88,7 +99,6 @@ router.get(
     }
   }
 );
-
 
 router.post(
   '/',

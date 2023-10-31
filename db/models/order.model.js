@@ -18,11 +18,26 @@ const OrderSchema = {
     allowNull: false,
     field: 'total_amount',
   },
+  totalAmountWithDiscount: {
+    type: DataTypes.FLOAT,
+    allowNull: false,
+    field: 'total_amount_with_discount',
+  },
   status: {
     allowNull: false,
     type: DataTypes.STRING,
   },
-
+  isCouponApplied: {
+    allowNull: false,
+    type: DataTypes.BOOLEAN,
+    field: 'is_coupon_applied',
+    defaultValue: false,
+  },
+  discountAmount: {
+    type: DataTypes.FLOAT,
+    allowNull: true,
+    field: 'discount_amount',
+  },
   deliveredAt: {
     allowNull: true,
     type: DataTypes.DATE,
@@ -98,6 +113,12 @@ class Order extends Model {
       as: 'orderProducts',
       foreignKey: 'orderId',
     });
+
+    this.hasMany(models.OrderStatusHistory, {
+      as: 'statusHistory',
+      foreignKey: 'orderId',
+    });
+
     this.belongsTo(models.CustomerAddress, {
       as: 'address',
     });
