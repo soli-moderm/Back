@@ -10,7 +10,8 @@
     "migrations:generate": "sequelize-cli migration:generate --name",
     "migrations:run": "sequelize-cli db:migrate",
     "migrations:revert": "sequelize-cli db:migrate:undo",
-    "migrations:delete": "sequelize-cli db:migrate:undo:all"
+    "migrations:delete": "sequelize-cli db:migrate:undo:all",
+    "seed:generate": "sequelize seed:generate --name"
   },
   "keywords": [],
   "author": "",
@@ -29,13 +30,16 @@
   },
   "dependencies": {
     "@hapi/boom": "^9.1.4",
+    "@sendgrid/mail": "^8.1.0",
     "aws-sdk": "^2.474.0",
+    "axios": "^1.6.3",
     "bcrypt": "^5.0.1",
     "conekta": "^4.2.0",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "faker": "^5.5.3",
+    "iconv-lite": "^0.6.3",
     "joi": "^17.4.2",
     "jsonwebtoken": "^8.5.1",
     "micro": "^10.0.1",

@@ -9,6 +9,7 @@ const { typeStatusOrder } = require('../utils/typeStatus');
 const { Coupon } = require('../db/models/coupon.model');
 const paginate = require('../utils/paginate');
 const { application } = require('express');
+const { sendEmailWithTemplate } = require('../utils/sendEmail');
 
 const stripe = require('stripe')(config.stripePrivateKey);
 
@@ -39,9 +40,28 @@ const unitPrice = (item) => {
   return priceUnit;
 };
 
+const unitPriceSubtotalAmount = (item) => {
+  let priceUnit = 0;
+  if (item.isProductWithVariant) {
+    const { price } = item.productVariant;
+    priceUnit = price;
+  } else {
+    const { price } = item;
+    priceUnit = price;
+  }
+  return priceUnit;
+};
+
 const calculateOrderAmount = (items) => {
   return items.reduce((totalAmount, item) => {
     const itemAmount = unitPrice(item) * item.qty;
+    return itemAmount + totalAmount;
+  }, 0);
+};
+
+const calculateOrderSubtotalAmount = (items) => {
+  return items.reduce((totalAmount, item) => {
+    const itemAmount = unitPriceSubtotalAmount(item) * item.qty;
     return itemAmount + totalAmount;
   }, 0);
 };
@@ -132,14 +152,19 @@ class OrderService {
       );
     }
 
-    const totalAamount = calculateOrderAmount(data.cartList);
+    const totalAmount = calculateOrderAmount(data.cartList);
+    const subtotalAmount = calculateOrderSubtotalAmount(data.cartList);
     console.log(
-      '🚀 ~ file: order.service.js:115 ~ OrderService ~ create ~ totalAamount:',
-      totalAamount
+      '🚀 ~ file: order.service.js:156 ~ OrderService ~ create ~ subtotalAmount:',
+      subtotalAmount
+    );
+    console.log(
+      '🚀 ~ file: order.service.js:115 ~ OrderService ~ create ~ totalAmount:',
+      totalAmount
     );
 
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.trunc(totalAamount) * 100,
+      amount: Math.trunc(totalAmount) * 100,
       currency: 'mxn',
       automatic_payment_methods: {
         enabled: true,
@@ -154,7 +179,7 @@ class OrderService {
     const newPaymentDetail = await models.OrderPayment.create({
       paymentIntentsStripeId: paymentIntent.id,
       paymentMethodType: paymentIntent.payment_method_types[0],
-      totalAamount: totalAamount,
+      totalAmount: totalAmount,
       status: paymentIntent.status,
     }).catch((error) => boom.badRequest(error));
     console.log(
@@ -163,11 +188,13 @@ class OrderService {
     );
 
     const orderObject = {
-      totalAamount,
+      totalAmount,
       customerId: customerExists ? customerExists.id : newCustomer.id,
       status: typeStatusOrder.ESPERANDO_CONFIRMACION_DE_PAGO,
       paymentId: newPaymentDetail.id,
       addressId: idAddress ? idAddress : newAddressCustomer.id,
+      subtotalAmount: subtotalAmount,
+      discountAmount: subtotalAmount - totalAmount,
     };
 
     if (data?.coupon) {
@@ -214,8 +241,29 @@ class OrderService {
       return boom.badRequest(error);
     }
 
+    // send email whit sendgrid to customer sendEmailWithTemplate
+
+    sendEmailWithTemplate(
+      "williams1991.rwag@gmail.com",
+      'Orden recibida',
+      'Orden recibida',
+      'd-3754e0d2f1d14f3892e71fe9b0ca18a7',
+      {
+        name: name,
+        lastName: lastName,
+        orderId: newOrder.id,
+        orderStatus: typeStatusOrder.ESPERANDO_CONFIRMACION_DE_PAGO,
+        orderDate: new Date(),
+        orderTotal: newOrder.totalAmount,
+        orderSubtotal: newOrder.subtotalAmount,
+        orderDiscount: newOrder.discountAmount,
+        orderAddress: `${street} ${outdoorNumber} ${interiorNumber} ${colony} ${municipality} ${zipCode}`,
+      }
+    );
+
     return {
       id: newOrder.id,
+      orderData: newOrder,
       clientSecret: paymentIntent.client_secret,
       customerId: customerExists ? customerExists.id : newCustomer.id,
       userId: userId ? userId : newUser.id,
@@ -399,70 +447,140 @@ class OrderService {
   }
 
   async applicationOrderCoupon(data) {
-    const { orderId, couponId } = data;
-    const order = await models.Order.findByPk(orderId).catch((error) =>
-      boom.badRequest(error)
+    const { orderId, couponName } = data;
+
+    const order = await models.Order.findByPk(orderId).catch((error) => {
+      return boom.badRequest(error);
+    });
+
+    console.log(
+      '🚀 ~ file: order.service.js:410 ~ OrderService ~ applicationOrderCoupon ~ order:',
+      order
     );
     const coupon = await models.Coupon.findAll({
       where: {
-        name: couponId,
+        name: couponName,
       },
     }).catch((error) => boom.badRequest(error));
+    console.log(
+      '🚀 ~ file: order.service.js:413 ~ OrderService ~ applicationOrderCoupon ~ coupon:',
+      coupon
+    );
 
-    if (order.isCouponApplied) {
-      return boom.badRequest('Tiene un cupón aplicado');
-    }
+    // if (order.isCouponApplied) {
+    //   return boom.badRequest('Tiene un cupón aplicado');
+    // }
 
     if (coupon.length === 0) {
-      return boom.badRequest('Cupón no encontrado');
+      throw boom.badRequest('Cupón no encontrado');
     }
 
     if (coupon[0].startDate > new Date()) {
-      return boom.badRequest('Cupón no disponible');
+      throw boom.badRequest('Cupón no disponible');
     }
 
     if (coupon[0].status === 'INACTIVO') {
-      return boom.badRequest('Cupón no disponible');
+      throw boom.badRequest('Cupón no disponible');
     }
 
     if (coupon[0].endDate < new Date()) {
-      return boom.badRequest('Cupón expirado');
+      throw boom.badRequest('Cupón expirado');
     }
 
     if (coupon[0].usageLimit <= coupon[0].timesUsed) {
-      return boom.badRequest('Cupón expirado');
+      throw boom.badRequest('Cupón expirado');
     }
 
     if (coupon[0].minimumPurchase > order.totalAmount) {
-      return boom.badRequest('El monton minimo de compra no se ha alcanzado');
+      throw boom.badRequest('El monton minimo de compra no se ha alcanzado');
     }
 
     let totalAmountWithDiscount = 0;
 
     if (coupon[0].type === 'MONTO') {
       totalAmountWithDiscount = order.totalAmount - coupon[0].discount;
+      console.log(
+        '🚀 ~ file: order.service.js:456 ~ OrderService ~ applicationOrderCoupon ~ coupon[0].discount:',
+        coupon[0].discount
+      );
     } else {
       const discount = (order.totalAmount * coupon[0].discount) / 100;
+      console.log(
+        '🚀 ~ file: order.service.js:462 ~ OrderService ~ applicationOrderCoupon ~ order.totalAmount:',
+        order.totalAmount
+      );
+      console.log(
+        '🚀 ~ file: order.service.js:458 ~ OrderService ~ applicationOrderCoupon ~ coupon[0].discount:',
+        coupon[0].discount
+      );
+      console.log(
+        '🚀 ~ file: order.service.js:458 ~ OrderService ~ applicationOrderCoupon ~ discount:',
+        discount
+      );
       if (discount > coupon[0].maximumDiscount) {
         totalAmountWithDiscount = order.totalAmount - coupon[0].maximumDiscount;
+        console.log(
+          '🚀 ~ file: order.service.js:473 ~ OrderService ~ applicationOrderCoupon ~ order.totalAmount:',
+          order.totalAmount
+        );
       } else {
         totalAmountWithDiscount = order.totalAmount - discount;
       }
     }
+    console.log(
+      '🚀 ~ file: order.service.js:452 ~ OrderService ~ applicationOrderCoupon ~ totalAmountWithDiscount:',
+      totalAmountWithDiscount
+    );
 
-    const newOrder = order.update({
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.trunc(totalAmountWithDiscount) * 100,
+      currency: 'mxn',
+      automatic_payment_methods: {
+        enabled: true,
+      },
+    });
+
+    console.log(
+      '🚀 ~ file: order.service.js:130 ~ OrderService ~ create ~ paymentIntent',
+      paymentIntent
+    );
+
+    const newPaymentDetail = await models.OrderPayment.create({
+      paymentIntentsStripeId: paymentIntent.id,
+      paymentMethodType: paymentIntent.payment_method_types[0],
+      totalAmount: totalAmountWithDiscount,
+      status: paymentIntent.status,
+    }).catch((error) => boom.badRequest(error));
+    console.log(
+      '🚀 ~ file: order.service.js:130 ~ OrderService ~ create ~ newPaymentDetail:',
+      newPaymentDetail
+    );
+
+    const discountAmountCoupon = order.totalAmount - totalAmountWithDiscount;
+    console.log(
+      '🚀 ~ file: order.service.js:539 ~ OrderService ~ applicationOrderCoupon ~ discountAmountCoupon:',
+      discountAmountCoupon
+    );
+    console.log(
+      '🚀 ~ file: order.service.js:548 ~ OrderService ~ applicationOrderCoupon ~  order.discountAmount:',
+      order.discountAmount
+    );
+    const newOrder = await order.update({
+      paymentId: newPaymentDetail.id,
       isCouponApplied: true,
-      totalAmountWithDiscount,
-      discountAmount: order.totalAmount - totalAmountWithDiscount,
+      totalAmount: totalAmountWithDiscount,
+      discountAmount: order.discountAmount + discountAmountCoupon,
       couponId: coupon[0].id,
     });
 
-    const newCoupon = coupon[0].update({
+    const newCoupon = await coupon[0].update({
       timesUsed: coupon[0].timesUsed + 1,
     });
 
     return {
-      order: newOrder,
+      id: newOrder.id,
+      orderData: newOrder,
+      clientSecret: paymentIntent.client_secret,
       coupon: newCoupon,
     };
   }

@@ -6,6 +6,11 @@ const { CUSTOMER_ADDRESS_TABLE } = require('./customer-address.model');
 
 const ORDER_TABLE = 'orders';
 
+// total_amount DECIMAL(10, 2) NOT NULL,
+// subtotal_amount DECIMAL(10, 2) NOT NULL,
+// discounts DECIMAL(10, 2) NOT NULL,
+// shipping_cost DECIMAL(10, 2) NOT NULL,
+
 const OrderSchema = {
   id: {
     allowNull: false,
@@ -13,15 +18,25 @@ const OrderSchema = {
     primaryKey: true,
     type: DataTypes.INTEGER,
   },
-  totalAamount: {
+  totalAmount: {
     type: DataTypes.FLOAT,
     allowNull: false,
     field: 'total_amount',
   },
-  totalAmountWithDiscount: {
+  subtotalAmount: {
     type: DataTypes.FLOAT,
     allowNull: false,
-    field: 'total_amount_with_discount',
+    field: 'subtotal_amount',
+  },
+  shippingCost: {
+    type: DataTypes.FLOAT,
+    allowNull: true,
+    field: 'shipping_cost',
+  },
+  discountAmount: {
+    type: DataTypes.FLOAT,
+    allowNull: true,
+    field: 'discount_amount',
   },
   status: {
     allowNull: false,
@@ -33,11 +48,7 @@ const OrderSchema = {
     field: 'is_coupon_applied',
     defaultValue: false,
   },
-  discountAmount: {
-    type: DataTypes.FLOAT,
-    allowNull: true,
-    field: 'discount_amount',
-  },
+
   deliveredAt: {
     allowNull: true,
     type: DataTypes.DATE,

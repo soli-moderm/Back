@@ -133,8 +133,9 @@ router.post(
 router.post('/applicationOrderCoupon', async (req, res, next) => {
   try {
     const body = req.body;
-    const newItem = await service.applicationOrderCoupon(body);
-    sedResponseSuccess(res, newItem, 'Coupon Aplicado', 201);
+    const data = await service.applicationOrderCoupon(body);
+
+    sedResponseSuccess(res, 201, 'Coupon Aplicado', data);
   } catch (error) {
     next(error);
   }

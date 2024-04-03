@@ -25,6 +25,36 @@ const ProductSchema = {
     type: DataTypes.FLOAT,
     allowNull: false,
   },
+  packageWeight: {
+    field: 'package_weight',
+    type: DataTypes.FLOAT,
+    allowNull: false,
+  },
+  packageHeight: {
+    field: 'package_height',
+    type: DataTypes.FLOAT,
+    allowNull: false,
+  },
+  packageWidth: {
+    field: 'package_width',
+    type: DataTypes.FLOAT,
+    allowNull: false,
+  },
+  packageLength: {
+    field: 'package_length',
+    type: DataTypes.FLOAT,
+    allowNull: false,
+  },
+  packagingCode: {
+    field: 'packaging_code',
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  classCode: {
+    field: 'class_code',
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
   stock: {
     type: DataTypes.INTEGER,
     allowNull: false,
@@ -61,13 +91,11 @@ class Product extends Model {
       foreignKey: 'productId',
       otherKey: 'categoryId',
     });
-   //un producto puede tener varias orderProduct
+    //un producto puede tener varias orderProduct
     this.hasMany(models.OrderProduct, {
       as: 'orders',
       foreignKey: 'product_id',
     });
-  
-    
   }
 
   static config(sequelize) {

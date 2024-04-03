@@ -49,6 +49,16 @@ const {
   PRODUCT_VARIANT_TABLE,
 } = require('./../models/product-variant.model');
 
+const {
+  ShipmentsSchema,
+  SHIPMENTS_TABLE,
+} = require('./../models/shipments.model');
+const { COMPANY_TABLE, CompanySchema } = require('../models/company.model');
+const {
+  PostalCodeSchema,
+  POSTAL_CODE_TABLE,
+} = require('../models/postal-code.model');
+
 module.exports = {
   up: async (queryInterface) => {
     await queryInterface.createTable(USER_TABLE, UserSchema);
@@ -85,6 +95,9 @@ module.exports = {
       CategoryProductSchema
     );
     await queryInterface.createTable(PRODUCT_IMAGES_TABLE, ProductImagesSchema);
+    await queryInterface.createTable(COMPANY_TABLE, CompanySchema);
+    await queryInterface.createTable(SHIPMENTS_TABLE, ShipmentsSchema);
+    await queryInterface.createTable(POSTAL_CODE_TABLE, PostalCodeSchema);
   },
 
   down: async (queryInterface) => {
@@ -104,5 +117,8 @@ module.exports = {
     await queryInterface.dropTable(ORDER_TABLE);
     await queryInterface.dropTable(CUSTOMER_TABLE);
     await queryInterface.dropTable(USER_TABLE);
+    await queryInterface.dropTable(COMPANY_TABLE);
+    await queryInterface.dropTable(SHIPMENTS_TABLE);
+    await queryInterface.dropTable(POSTAL_CODE_TABLE);
   },
 };

@@ -1,4 +1,6 @@
 const boom = require('@hapi/boom');
+const UserService = require('./user.service');
+const ShipmentsService = require('./shipments.service');
 
 const { models } = require('../libs/sequelize');
 
@@ -7,6 +9,8 @@ const { config } = require('../config/config');
 const { typeStatusOrder } = require('../utils/typeStatus');
 
 const stripe = require('stripe')(config.stripePrivateKey);
+
+const serviceShipments = new ShipmentsService();
 
 class paymentService {
   constructor() {}
@@ -24,7 +28,7 @@ class paymentService {
         {
           status: paymentIntent.status,
           paymentMethodType: paymentMethod.type,
-          totalAamount: paymentIntent.amount / 100,
+          totalAmount: paymentIntent.amount / 100,
           paidAt: new Date(),
         },
         {
@@ -55,10 +59,25 @@ class paymentService {
           newStatus
         );
 
+        // Shipments
+        try {
+          const shipments = serviceShipments.createShipment(order[0]);
+          console.log(
+            '🚀 ~ file: payment.service.js:65 ~ paymentService ~ paymentSucceeded ~ shipments',
+            shipments
+          );
+        } catch (error) {
+          console.log(
+            '🚀 ~ file: payment.service.js:65 ~ paymentService ~ paymentSucceeded ~ error',
+            error
+          );
+        }
+
         return orderUpdate;
       }
     }
   }
+
   async paymentRequiresAction(paymentIntent) {
     const payment = await models.OrderPayment.findAll({
       where: { paymentIntentsStripeId: paymentIntent.id },
@@ -73,7 +92,7 @@ class paymentService {
         {
           status: paymentIntent.status,
           paymentMethodType: paymentMethod.type,
-          totalAamount: paymentIntent.amount / 100,
+          totalAmount: paymentIntent.amount / 100,
         },
         {
           where: {
@@ -121,7 +140,7 @@ class paymentService {
         {
           status: paymentIntent.status,
           paymentMethodType: paymentMethod.type,
-          totalAamount: paymentIntent.amount / 100,
+          totalAmount: paymentIntent.amount / 100,
         },
         {
           where: {

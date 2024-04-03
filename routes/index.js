@@ -9,6 +9,7 @@ const imagesRouter = require('./images.router');
 const stipeRouter = require('./payment.router');
 const customerAddressRouter = require('./customerAddress.router');
 const couponRouter = require('./coupon.router');
+const codePostalRouter = require('./codePostal.router');
 
 const routerApi = (app) => {
   const router = express.Router();
@@ -23,6 +24,7 @@ const routerApi = (app) => {
   router.use('/webhook', stipeRouter);
   router.use('/customerAddress', customerAddressRouter);
   router.use('/coupon', couponRouter);
+  router.use('/codePostal', codePostalRouter);
 };
 
 module.exports = routerApi;

@@ -35,6 +35,11 @@ const {
   Product_variant,
   ProductVariantSchema,
 } = require('./product-variant.model');
+const { Company, CompanySchema } = require('./company.model');
+
+const {Shipments, ShipmentsSchema } = require('./shipments.model');
+
+const {PostalCode, PostalCodeSchema} = require('./postal-code.model');
 
 function setupModels(sequelize) {
   User.init(UserSchema, User.config(sequelize));
@@ -64,6 +69,9 @@ function setupModels(sequelize) {
   );
   Product_Images.init(ProductImagesSchema, Product_Images.config(sequelize));
   Product_variant.init(ProductVariantSchema, Product_variant.config(sequelize));
+  Company.init(CompanySchema, Company.config(sequelize));
+  Shipments.init(ShipmentsSchema, Shipments.config(sequelize));
+  PostalCode.init(PostalCodeSchema, PostalCode.config(sequelize));
 
   User.associate(sequelize.models);
   Customer.associate(sequelize.models);
@@ -80,6 +88,10 @@ function setupModels(sequelize) {
   CategoryProduct.associate(sequelize.models);
   Product_Images.associate(sequelize.models);
   Product_variant.associate(sequelize.models);
+  Company.associate(sequelize.models);
+  Shipments.associate(sequelize.models);
+  PostalCode.associate(sequelize.models);
+
 }
 
 module.exports = setupModels;

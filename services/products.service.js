@@ -23,6 +23,12 @@ class ProductsService {
       promotionalPrice = 0,
       stock = null,
       files = [],
+      packageWeight,
+      packageHeight,
+      packageWidth,
+      packageLength,
+      packagingCode,
+      classCode,
     } = body;
 
     //create Product
@@ -34,6 +40,12 @@ class ProductsService {
       status,
       promotionalPrice,
       stock,
+      packageWeight,
+      packageHeight,
+      packageWidth,
+      packageLength,
+      packagingCode,
+      classCode,
     });
 
     if (productVariant) {
@@ -204,6 +216,12 @@ class ProductsService {
       promotionalPrice = 0,
       stock = null,
       files = [],
+      packageWeight,
+      packageHeight,
+      packageWidth,
+      packageLength,
+      packagingCode,
+      classCode,
     } = body;
 
     try {
@@ -219,6 +237,12 @@ class ProductsService {
         status,
         promotionalPrice,
         stock,
+        packageWeight,
+        packageHeight,
+        packageWidth,
+        packageLength,
+        packagingCode,
+        classCode,
       });
     } catch (error) {
       return boom.badRequest(error);

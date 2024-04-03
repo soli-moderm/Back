@@ -25,7 +25,7 @@ const OrderPaymentSchema = {
     allowNull: true,
     type: DataTypes.STRING,
   },
-  totalAamount: {
+  totalAmount: {
     type: DataTypes.FLOAT,
     allowNull: false,
     field: 'total_amount',
@@ -43,12 +43,11 @@ const OrderPaymentSchema = {
 
 class OrderPayment extends Model {
   static associate(models) {
-
     //un payment le pertenece a una orden
     this.hasOne(models.Order, {
-        as: 'order',
-        foreignKey: 'paymentId'
-      });
+      as: 'order',
+      foreignKey: 'paymentId',
+    });
 
     //
   }

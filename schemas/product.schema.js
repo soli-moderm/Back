@@ -39,6 +39,12 @@ const createProductSchema = Joi.object({
   promotionalPrice: promotionalPrice.optional(),
   stock: stock.optional(),
   files: files.optional(),
+  packageWeight: Joi.number().optional(),
+  packageHeight: Joi.number().optional(),
+  packageWidth: Joi.number().optional(),
+  packageLength: Joi.number().optional(),
+  packagingCode: Joi.string().optional(),
+  classCode: Joi.string().optional(),
 });
 
 const updateProductSchema = Joi.object({
@@ -51,6 +57,12 @@ const updateProductSchema = Joi.object({
   promotionalPrice: promotionalPrice.optional(),
   stock: stock.optional(),
   files: files.optional(),
+  packageWeight: Joi.number().optional(),
+  packageHeight: Joi.number().optional(),
+  packageWidth: Joi.number().optional(),
+  packageLength: Joi.number().optional(),
+  packagingCode: Joi.string().optional(),
+  classCode: Joi.string().optional(),
 });
 
 const getProductSchema = Joi.object({
@@ -64,7 +76,7 @@ const queryProductSchema = Joi.object({
   price_max: price_max.when('price_min', {
     is: price_min.required(),
     then: Joi.required(),
-  })
+  }),
 });
 
 const deleteProductSchema = Joi.object({
@@ -85,18 +97,14 @@ const getProductSearchProduct = Joi.object({
   price_max: price_max.when('price_min', {
     is: price_min.required(),
     then: Joi.required(),
-  })
+  }),
 });
 
-
-
-
-const getProductSchemaSimilarProductsByCategory =
-Joi.object({
+const getProductSchemaSimilarProductsByCategory = Joi.object({
   page,
   pageSize,
-  Idcategory:id,
-  idNot:id,
+  Idcategory: id,
+  idNot: id,
 });
 
 module.exports = {
@@ -107,5 +115,5 @@ module.exports = {
   deleteProductSchema,
   getProductSchemaCategory,
   getProductSearchProduct,
-  getProductSchemaSimilarProductsByCategory
+  getProductSchemaSimilarProductsByCategory,
 };
