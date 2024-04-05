@@ -6,6 +6,7 @@ const { array, object } = require('joi');
 const favoriteNameProvider = [
   'DHL',
   'FEDEX',
+  'TRESGUERRAS',
   'PAQUETEEXPRESS',
   'TRESGUERRAS',
   'REDPACK',
