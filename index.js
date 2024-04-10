@@ -35,6 +35,7 @@ const whitelist = [
   'http://localhost:3002',
   'https://api.solimoder.com',
   'http://api.solimoder.com',
+  'http://www.api.solimoderm.com/',
 ];
 
 const options = {
