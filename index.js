@@ -28,26 +28,6 @@ app.listen(port, () => {
   console.log('mi port --> ' + port);
 });
 
-const whitelist = [
-  'https://localhost:5500',
-  'http://localhost:3001',
-  'http://localhost:3000',
-  'http://localhost:3002',
-  'https://api.solimoder.com',
-  'http://api.solimoder.com',
-  'http://www.api.solimoderm.com/',
-];
-
-const options = {
-  origin: (origin, callback) => {
-    if (whitelist.includes(origin) || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error('no permitido' + origin), false);
-    }
-  },
-};
-
 app.use((req, res, next) => {
   if (req.originalUrl === '/api/v1/webhook') {
     next();
@@ -55,7 +35,7 @@ app.use((req, res, next) => {
     express.json()(req, res, next);
   }
 });
-app.use(cors(options));
+
 app.use(passport.initialize());
 require('./utils/auth');
 
