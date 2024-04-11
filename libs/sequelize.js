@@ -9,11 +9,15 @@ const URI = `postgres://${USER}:${PASSWORD}@${config.dbHost}:${config.dbPort}/${
 
 const sequelize = new Sequelize(URI, {
   dialect: 'postgres',
-  ssl: true,
+  dialectOptions: {
+    ssl: {
+      require: true,
+    },
+  },
+
   logging: console.log,
 });
 
 setupModels(sequelize);
-
 
 module.exports = sequelize;
