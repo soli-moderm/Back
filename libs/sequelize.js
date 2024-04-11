@@ -9,6 +9,7 @@ const URI = `postgresql://${USER}:${PASSWORD}@${config.dbHost}:${config.dbPort}/
 
 const sequelize = new Sequelize(URI, {
   dialect: 'postgres',
+  ssl: true,
   dialectOptions: {
     ssl: {
       require: true, // This will help you. But you will see nwe error
