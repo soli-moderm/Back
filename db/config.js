@@ -8,10 +8,24 @@ module.exports = {
   development: {
     url: URI,
     dialect: 'postgres',
+    ssl: true,
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+      },
+    },
     // logging: console.log,
   },
   production: {
     url: URI,
     dialect: 'postgres',
-  }
-}
+    ssl: true,
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+      },
+    },
+  },
+};
