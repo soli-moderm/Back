@@ -9,10 +9,8 @@ const URI = `postgres://${USER}:${PASSWORD}@${config.dbHost}:${config.dbPort}/${
 
 const sequelize = new Sequelize(URI, {
   dialect: 'postgres',
-  ssl: true,
   dialectOptions: {
     ssl: {
-      require: true, // This will help you. But you will see nwe error
       rejectUnauthorized: false, // This line will fix new error
     },
   },
