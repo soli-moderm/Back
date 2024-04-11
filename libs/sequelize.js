@@ -11,10 +11,7 @@ const sequelize = new Sequelize(URI, {
   logging: false,
   ssl: true,
   dialectOptions: {
-    ssl: {
-      require: true,
-      rejectUnauthorized: false,
-    },
+    ssl: true,
   },
 });
 
