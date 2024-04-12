@@ -16,7 +16,7 @@ const app = express();
 app.use(passport.initialize({ session: false }));
 
 //le decimos el puerto en que queremos que corra la aplicación
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3001 || 443;
 
 app.get('/', (req, res) => {
   res.send('hola mi server en express');
