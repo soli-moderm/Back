@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const passport = require('passport');
+const fs = require('fs');
+const https = require('https');
 
 const routerApi = require('./routes/index');
 
@@ -21,18 +23,28 @@ const port = process.env.PORT || 3001 || 443;
 app.get('/', (req, res) => {
   res.send('hola mi server en express');
 });
+const httpsOptions = {
+  key: fs.readFileSync(process.env.PRIVATE_KEY_PATH),
+  cert: fs.readFileSync(process.env.CERTIFICATE_PATH),
+};
+
+const server = https.createServer(httpsOptions, app);
 
 //le decimos a la aplicación en que puesto escuchar
 // además creamos un callback que nos avisará cuando esté corriendo
-app.listen(port, () => {
+server.listen(port, () => {
   console.log('mi port --> ' + port);
 });
 
+// cors
+app.use(cors());
+
+// Redirect HTTP to HTTPS
 app.use((req, res, next) => {
-  if (req.originalUrl === '/api/v1/webhook') {
-    next();
+  if (req.protocol === 'http') {
+    res.redirect(`https://${req.headers.host}${req.url}`);
   } else {
-    express.json()(req, res, next);
+    next();
   }
 });
 
