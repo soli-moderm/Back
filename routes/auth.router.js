@@ -9,7 +9,7 @@ const service = new AuthService();
 router.post(
   '/login',
   //verificas si existe el email y si coincide la contraseña
-  passport.authenticate('local', { failureRedirect: '/login' }),
+  passport.authenticate('local', { failureRedirect: '/' }),
   async (req, res, next) => {
     try {
       //usuario que te regresa Password
