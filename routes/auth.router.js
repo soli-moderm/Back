@@ -15,6 +15,7 @@ router.post(
     try {
       //usuario que te regresa Password
       const user = req.user;
+      console.log('🚀 ~ user:', user);
       //retorna un token
       res.json(service.signToken(user));
     } catch (error) {

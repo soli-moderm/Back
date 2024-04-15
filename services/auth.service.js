@@ -21,7 +21,7 @@ class AuthService {
     return user;
   }
 
-  signToken(user) {
+  async signToken(user) {
     const payload = {
       sub: user.id,
       role: user.role,
