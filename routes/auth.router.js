@@ -16,8 +16,15 @@ router.post(
       //usuario que te regresa Password
       const user = req.user;
       console.log('🚀 ~ user:', user);
+      if (!user) {
+        return res.status(400).json({ error: 'Invalid user' });
+      }
+      const token = service.signToken(user);
+      if (!token) {
+        return res.status(400).json({ error: 'Unable to sign token' });
+      }
       //retorna un token
-      res.json(service.signToken(user));
+      res.json(token);
     } catch (error) {
       next(error);
     }
