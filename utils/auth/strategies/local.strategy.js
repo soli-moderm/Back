@@ -1,14 +1,17 @@
-const { Strategy } = require('passport-local');
+const { LocalStrategy } = require('passport-local');
 
 const AuthService = require('./../../../services/auth.service');
 const service = new AuthService();
 
-const LocalStrategy = new Strategy(
+const LocalStrategyPassport = new LocalStrategy(
   {
     usernameField: 'email',
     passwordField: 'password',
   },
   async (email, password, done) => {
+    console.log('🚀 ~ password:', password);
+    console.log('🚀 ~ email:', email);
+
     try {
       const user = await service.getUser(email, password);
       console.log('🚀 ~ user-passport:', user);
@@ -23,4 +26,4 @@ const LocalStrategy = new Strategy(
   }
 );
 
-module.exports = LocalStrategy;
+module.exports = LocalStrategyPassport;
