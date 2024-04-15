@@ -1,4 +1,4 @@
-const { LocalStrategy } = require('passport-local');
+const { LocalStrategy } = require('passport-local').Strategy;
 
 const AuthService = require('./../../../services/auth.service');
 const service = new AuthService();
@@ -21,7 +21,11 @@ const LocalStrategyPassport = new LocalStrategy(
       }
       done(null, user);
     } catch (error) {
-      done(new Error('Error al autenticar el usuario'), false);
+      if (error.message === 'Usuario no encontrado') {
+        done(new Error('Usuario no encontrado'), false);
+      } else {
+        done(new Error('Error al autenticar el usuario'), false);
+      }
     }
   }
 );
