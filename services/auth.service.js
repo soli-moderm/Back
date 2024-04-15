@@ -33,6 +33,8 @@ class AuthService {
         exp: Math.floor(Date.now() / 1000) + 480 * 60, //8h
       };
       const token = jwt.sign(payload, config.jwtSecret);
+      console.log('🚀 ~ AuthService ~ signToken ~ token:', token);
+      console.log('🚀 ~ AuthService ~ signToken ~ user:', user);
       return {
         user,
         token,
