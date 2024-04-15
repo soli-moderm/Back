@@ -60,6 +60,28 @@ app.use(ormErrorHandler);
 app.use(boomErrorHandler);
 app.use(errorHandler);
 
+// Middleware para hacer log de las solicitudes
+app.use((req, res, next) => {
+  const logStream = fs.createWriteStream(path.join(__dirname, 'api.log'), {
+    flags: 'a',
+  });
+
+  logStream.write(`${new Date().toISOString()} - ${req.method} ${req.url}\n`);
+
+  logStream.on('finish', () => {
+    console.log('Request logged:', `${req.method} ${req.url}`);
+  });
+
+  next();
+});
+
+// Manejo de errores
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).send('Algo salió mal');
+  next();
+});
+
 // log in file app.log
 
 const logStream = fs.createWriteStream(path.join(__dirname, 'app.log'), {
