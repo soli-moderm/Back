@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const passport = require('passport');
 const fs = require('fs');
+const path = require('path');
+
 const https = require('https');
 
 const routerApi = require('./routes/index');
@@ -57,3 +59,14 @@ app.use(logErrors);
 app.use(ormErrorHandler);
 app.use(boomErrorHandler);
 app.use(errorHandler);
+
+// log in file app.log
+
+const logStream = fs.createWriteStream(path.join(__dirname, 'app.log'), {
+  flags: 'a',
+});
+
+console.log = function (msg) {
+  logStream.write(`${new Date().toISOString()} - ${msg} \n`);
+  process.stdout.write(`${new Date().toISOString()} - ${msg} \n`);
+};
