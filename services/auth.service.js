@@ -9,29 +9,37 @@ const service = new UserService();
 
 class AuthService {
   async getUser(email, password) {
-    const user = await service.findByEmail(email);
-    if (!user) {
-      throw boom.unauthorized();
+    try {
+      const user = await service.findByEmail(email);
+      if (!user) {
+        throw boom.unauthorized();
+      }
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        throw boom.unauthorized();
+      }
+      delete user.dataValues.password;
+      return user;
+    } catch (error) {
+      throw boom.unauthorized('Invalid credentials');
     }
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      throw boom.unauthorized();
-    }
-    delete user.dataValues.password;
-    return user;
   }
 
   async signToken(user) {
-    const payload = {
-      sub: user.id,
-      role: user.role,
-      exp: Math.floor(Date.now() / 1000) + 480 * 60, //8h
-    };
-    const token = jwt.sign(payload, config.jwtSecret);
-    return {
-      user,
-      token,
-    };
+    try {
+      const payload = {
+        sub: user.id,
+        role: user.role,
+        exp: Math.floor(Date.now() / 1000) + 480 * 60, //8h
+      };
+      const token = jwt.sign(payload, config.jwtSecret);
+      return {
+        user,
+        token,
+      };
+    } catch (error) {
+      throw boom.internal('Error signing token');
+    }
   }
 
   async createPassword(password, id) {
