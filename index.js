@@ -70,3 +70,18 @@ console.log = function (msg) {
   logStream.write(`${new Date().toISOString()} - ${msg} \n`);
   process.stdout.write(`${new Date().toISOString()} - ${msg} \n`);
 };
+
+console.error = function (msg) {
+  logStream.write(`${new Date().toISOString()} -  ERROR: ${msg} \n`);
+  process.stderr.write(`${new Date().toISOString()} -  ERROR: ${msg} \n`);
+};
+
+console.info = function (msg) {
+  logStream.write(`${new Date().toISOString()} -  INFO: ${msg} \n`);
+  process.stdout.write(`${new Date().toISOString()} -  INFO: ${msg} \n`);
+};
+
+console.warn = function (msg) {
+  logStream.write(`${new Date().toISOString()} -  WARN: ${msg} \n`);
+  process.stdout.write(`${new Date().toISOString()} -  WARN: ${msg} \n`);
+};
