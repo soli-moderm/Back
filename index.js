@@ -57,7 +57,7 @@ app.use((req, res, next) => {
 // cors
 app.use(cors());
 
-app.use(passport.initialize());
+app.use(passport.initialize({ session: false }));
 require('./utils/auth');
 
 routerApi(app);
