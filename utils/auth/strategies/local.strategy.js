@@ -1,9 +1,9 @@
-const { LocalStrategy } = require('passport-local').Strategy;
+const { Strategy } = require('passport-local');
 
 const AuthService = require('./../../../services/auth.service');
 const service = new AuthService();
 
-const LocalStrategyPassport = new LocalStrategy(
+const LocalStrategyPassport = new Strategy(
   {
     usernameField: 'email',
     passwordField: 'password',
