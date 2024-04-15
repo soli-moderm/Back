@@ -17,7 +17,6 @@ const {
 
 // creamos una aplicación
 const app = express();
-app.use(passport.initialize({ session: false }));
 
 //le decimos el puerto en que queremos que corra la aplicación
 const port = process.env.PORT || 3001 || 443;
@@ -38,9 +37,6 @@ server.listen(port, () => {
   console.log('mi port --> ' + port);
 });
 
-// cors
-app.use(cors());
-
 // Redirect HTTP to HTTPS
 app.use((req, res, next) => {
   if (req.protocol === 'http') {
@@ -49,6 +45,17 @@ app.use((req, res, next) => {
     next();
   }
 });
+
+app.use((req, res, next) => {
+  if (req.originalUrl === '/api/v1/webhook') {
+    next();
+  } else {
+    express.json()(req, res, next);
+  }
+});
+
+// cors
+app.use(cors());
 
 app.use(passport.initialize());
 require('./utils/auth');
