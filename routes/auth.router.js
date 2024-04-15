@@ -18,12 +18,12 @@ router.post(
       if (!user) {
         return res.status(400).json({ error: 'Invalid user' });
       }
-      const token = service.signToken(user);
+      const { token } = service.signToken(user);
       if (!token) {
         return res.status(400).json({ error: 'Unable to sign token' });
       }
       //retorna un token
-      res.json(token);
+      res.json({ token, user });
     } catch (error) {
       next(error);
     }
