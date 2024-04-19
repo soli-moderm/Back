@@ -244,7 +244,7 @@ class OrderService {
     // send email whit sendgrid to customer sendEmailWithTemplate
 
     sendEmailWithTemplate(
-      "williams1991.rwag@gmail.com",
+      'williams1991.rwag@gmail.com',
       'Orden recibida',
       'Orden recibida',
       'd-3754e0d2f1d14f3892e71fe9b0ca18a7',
@@ -377,6 +377,9 @@ class OrderService {
   }
 
   async findOrdersByCustomerId(userId) {
+    if (typeof userId !== 'number') {
+      throw new Error('userId must be a number');
+    }
     const customer = await models.Customer.findOne({
       where: {
         userId,
