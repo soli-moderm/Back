@@ -38,23 +38,12 @@ router.get(
     console.log('🚀 ~ file: order.router.js:73 ~ err', err);
     console.log('🚀 ~ file: order.router.js:73 ~ user', user);
     console.log('🚀 ~ file: order.router.js:73 ~ info', info);
-
-    if (err) {
-      return res.status(401).json({ status: 'error', message: err });
-    }
-    if (!user) {
-      return res.status(401).json({ status: 'error', message: 'No user' });
-    }
   }),
   checkRoles('Customer'),
   async (req, res, next) => {
     console.log('🚀 ~ file: order.router.js:73 ~ req:', req);
     try {
-      const { authorization } = req.headers;
-      const token = authorization.split(' ')[1];
-      const payload = jwt.decode(token, process.env.AUTH_JWT_SECRET);
-      const { sub } = payload;
-      const userId = sub;
+      const userId = req.user.id;
       const orders = await service.findOrdersByCustomerId(userId);
 
       res.status(201).json({
