@@ -142,6 +142,8 @@ class ShipmentsService {
     );
 
     const Shipments = productsParcels.map((productParcel) => {
+      const address1from = `${company.street} ${company.outdoorNumber}`;
+      const address1to = `${CustomerAddress.street} ${CustomerAddress.outdoorNumber}`;
       return {
         address_from: {
           province: company.state,
@@ -149,7 +151,7 @@ class ShipmentsService {
           name: company.name,
           zip: company.zipCode,
           country: 'MX',
-          address1: company.street,
+          address1:address1from,
           company: company.CompanyName,
           address2: company.colony,
           phone: company.phone,
@@ -162,7 +164,7 @@ class ShipmentsService {
           name: CustomerAddress.name,
           zip: CustomerAddress.zipCode,
           country: 'MX',
-          address1: CustomerAddress.street,
+          address1: address1to,
           company: CustomerAddress.company,
           address2: CustomerAddress.colony,
           phone: CustomerAddress.customer.phone,
