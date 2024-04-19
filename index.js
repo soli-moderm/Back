@@ -83,6 +83,7 @@ app.use((req, res, next) => {
 });
 
 // Manejo de errores
+
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(500).send('Algo salió mal');
@@ -95,22 +96,26 @@ const logStream = fs.createWriteStream(path.join(__dirname, 'app.log'), {
   flags: 'a',
 });
 
-console.log = function (msg) {
+console.log = function () {
+  const msg = Array.from(arguments).join(' ');
   logStream.write(`${new Date().toISOString()} - ${msg} \n`);
   process.stdout.write(`${new Date().toISOString()} - ${msg} \n`);
 };
 
-console.error = function (msg) {
+console.error = function () {
+  const msg = Array.from(arguments).join(' ');
   logStream.write(`${new Date().toISOString()} -  ERROR: ${msg} \n`);
   process.stderr.write(`${new Date().toISOString()} -  ERROR: ${msg} \n`);
 };
 
-console.info = function (msg) {
+console.info = function () {
+  const msg = Array.from(arguments).join(' ');
   logStream.write(`${new Date().toISOString()} -  INFO: ${msg} \n`);
   process.stdout.write(`${new Date().toISOString()} -  INFO: ${msg} \n`);
 };
 
-console.warn = function (msg) {
+console.warn = function () {
+  const msg = Array.from(arguments).join(' ');
   logStream.write(`${new Date().toISOString()} -  WARN: ${msg} \n`);
   process.stdout.write(`${new Date().toISOString()} -  WARN: ${msg} \n`);
 };
