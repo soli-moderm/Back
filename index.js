@@ -97,25 +97,25 @@ const logStream = fs.createWriteStream(path.join(__dirname, 'app.log'), {
 });
 
 console.log = function () {
-  const msg = Array.from(arguments).join(' ');
+  const msg = Array.from(arguments).map(arg => typeof arg === 'object' ? JSON.stringify(arg) : arg).join(' ');
   logStream.write(`${new Date().toISOString()} - ${msg} \n`);
   process.stdout.write(`${new Date().toISOString()} - ${msg} \n`);
 };
 
 console.error = function () {
-  const msg = Array.from(arguments).join(' ');
+  const msg = Array.from(arguments).map(arg => typeof arg === 'object' ? JSON.stringify(arg) : arg).join(' ');
   logStream.write(`${new Date().toISOString()} -  ERROR: ${msg} \n`);
   process.stderr.write(`${new Date().toISOString()} -  ERROR: ${msg} \n`);
 };
 
 console.info = function () {
-  const msg = Array.from(arguments).join(' ');
+  const msg = Array.from(arguments).map(arg => typeof arg === 'object' ? JSON.stringify(arg) : arg).join(' ');
   logStream.write(`${new Date().toISOString()} -  INFO: ${msg} \n`);
   process.stdout.write(`${new Date().toISOString()} -  INFO: ${msg} \n`);
 };
 
 console.warn = function () {
-  const msg = Array.from(arguments).join(' ');
+  const msg = Array.from(arguments).map(arg => typeof arg === 'object' ? JSON.stringify(arg) : arg).join(' ');
   logStream.write(`${new Date().toISOString()} -  WARN: ${msg} \n`);
   process.stdout.write(`${new Date().toISOString()} -  WARN: ${msg} \n`);
 };
