@@ -52,13 +52,13 @@ router.get(
   passport.authenticate('jwt', { session: false }),
   checkRoles('Customer'),
   async (req, res, next) => {
-    console.log('🚀 ~ findOrdersByCustomer ~ req:', req);
     try {
       const { authorization } = req.headers;
       const token = authorization.split(' ')[1];
       const payload = jwt.decode(token, process.env.AUTH_JWT_SECRET);
       const { sub } = payload;
       const userId = sub;
+      console.log('🚀 ~ userId:', userId);
       const orders = await service.findOrdersByCustomerId(userId);
 
       res.status(201).json({
