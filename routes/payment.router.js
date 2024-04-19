@@ -6,7 +6,7 @@ const paymentService = require('../services/payment.service');
 
 const stripe = require('stripe')(config.stripePrivateKey);
 const endpointSecret =
-  'whsec_dce672008bc95d265f051107f9e469522da45d511963a747f8ef60c1a617c2e4';
+  'whsec_G299MrGqv1gOJeN13lI4KkfMcW2ZfNZj';
 
 const service = new paymentService();
 
