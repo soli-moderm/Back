@@ -32,30 +32,6 @@ router.get(
     }
   }
 );
-router.get(
-  '/findOrdersByCustomer',
-  passport.authenticate('jwt', { session: false }, (err, user, info) => {
-    console.log('🚀 ~ file: order.router.js:73 ~ err', err);
-    console.log('🚀 ~ file: order.router.js:73 ~ user', user);
-    console.log('🚀 ~ file: order.router.js:73 ~ info', info);
-  }),
-  checkRoles('Customer'),
-  async (req, res, next) => {
-    console.log('🚀 ~ file: order.router.js:73 ~ req:', req);
-    try {
-      const userId = req.user.id;
-      const orders = await service.findOrdersByCustomerId(userId);
-
-      res.status(201).json({
-        status: 'success',
-        message: 'Get ordenes',
-        data: orders,
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-);
 
 router.get(
   '/:id',
