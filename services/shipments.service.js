@@ -211,6 +211,7 @@ class ShipmentsService {
         }
       })
     );
+    console.log('🚀 ~ ShipmentsService ~ createShipment ~ errors:', errors);
 
     console.log(
       '🚀 ~ file: shipments.service.js:141 ~ ShipmentsService ~ createShipment ~ responses:',
