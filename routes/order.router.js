@@ -73,14 +73,11 @@ router.get(
   async (req, res, next) => {
     console.log('🚀 ~ file: order.router.js:73 ~ req:', req);
     try {
-      const { authorization } = req.headers;
-      const token = authorization.split(' ')[1];
-      const payload = jwt.decode(token, process.env.AUTH_JWT_SECRET);
-      const { sub } = payload;
-      const userId = sub;
+      const userId = Number(req.user.id);
+
       const orders = await service.findOrdersByCustomerId(userId);
 
-      res.status(201).json({
+      res.status(200).json({
         status: 'success',
         message: 'Get ordenes',
         data: orders,
