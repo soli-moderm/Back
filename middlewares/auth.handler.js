@@ -14,13 +14,13 @@ function checkApiKey(req, res, next) {
 function checkRoles(...roles) {
   return (req, res, next) => {
     const user = req.user;
+    console.log('🚀 ~checkRoles ~ return ~ user:', user);
     if (roles.includes(user.role)) {
       next();
     } else {
       next(boom.unauthorized());
     }
-  }
+  };
 }
 
-
-module.exports = { checkApiKey, checkRoles }
+module.exports = { checkApiKey, checkRoles };

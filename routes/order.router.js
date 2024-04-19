@@ -34,7 +34,18 @@ router.get(
 );
 router.get(
   '/findOrdersByCustomer',
-  passport.authenticate('jwt', { session: false }),
+  passport.authenticate('jwt', { session: false }, (err, user, info) => {
+    console.log('🚀 ~ file: order.router.js:73 ~ err', err);
+    console.log('🚀 ~ file: order.router.js:73 ~ user', user);
+    console.log('🚀 ~ file: order.router.js:73 ~ info', info);
+
+    if (err) {
+      return res.status(401).json({ status: 'error', message: err });
+    }
+    if (!user) {
+      return res.status(401).json({ status: 'error', message: 'No user' });
+    }
+  }),
   checkRoles('Customer'),
   async (req, res, next) => {
     console.log('🚀 ~ file: order.router.js:73 ~ req:', req);
