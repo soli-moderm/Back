@@ -189,13 +189,13 @@ class ShipmentsService {
         try {
           const options = {
             headers: {
-              Authorization: `Token token=${config.tokenSecretSkydropxDemo}`,
+              Authorization: `Token token=${config.tokenSecretSkydropx}`,
               'Content-Type': 'application/json',
             },
           };
 
           const response = await axios.post(
-            'https://api-demo.skydropx.com/v1/shipments',
+            'https://api.skydropx.com/v1/shipments',
             shipment,
             options
           );
@@ -234,12 +234,12 @@ class ShipmentsService {
         try {
           const options = {
             headers: {
-              Authorization: `Token token=${config.tokenSecretSkydropxDemo}`,
+              Authorization: `Token token=${config.tokenSecretSkydropx}`,
               'Content-Type': 'application/json',
             },
           };
           const label = await axios.post(
-            `https://api-demo.skydropx.com/v1/labels`,
+            `https://api.skydropx.com/v1/labels`,
             {
               rate_id: Number(bestProvider?.id),
               label_format: 'pdf',
