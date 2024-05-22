@@ -255,6 +255,7 @@ class ShipmentsService {
       })
     );
     console.log('🚀 ~ ShipmentsService ~ createShipment ~ labels:', labels);
+    
     // save labels in db
 
     const lasbelsinDB = await Promise.all(

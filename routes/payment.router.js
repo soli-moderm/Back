@@ -5,8 +5,8 @@ const { config } = require('../config/config');
 const paymentService = require('../services/payment.service');
 
 const stripe = require('stripe')(config.stripePrivateKey);
-const endpointSecret =
-  'whsec_G299MrGqv1gOJeN13lI4KkfMcW2ZfNZj';
+
+const endpointSecret = config.endpointSecret;
 
 const service = new paymentService();
 

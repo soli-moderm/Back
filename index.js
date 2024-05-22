@@ -24,6 +24,8 @@ const port = process.env.PORT || 3001 || 443;
 app.get('/', (req, res) => {
   res.send('hola mi server en express');
 });
+
+// Configuración de HTTPS
 const httpsOptions = {
   key: fs.readFileSync(process.env.PRIVATE_KEY_PATH),
   cert: fs.readFileSync(process.env.CERTIFICATE_PATH),
@@ -45,6 +47,15 @@ app.use((req, res, next) => {
     next();
   }
 });
+
+
+// //no production sin https
+
+// app.listen(port, () => {
+//   console.log('mi port --> ' + port);
+// });
+
+
 
 app.use((req, res, next) => {
   if (req.originalUrl === '/api/v1/webhook') {
@@ -92,30 +103,30 @@ app.use((err, req, res, next) => {
 
 // log in file app.log
 
-const logStream = fs.createWriteStream(path.join(__dirname, 'app.log'), {
-  flags: 'a',
-});
+// const logStream = fs.createWriteStream(path.join(__dirname, 'app.log'), {
+//   flags: 'a',
+// });
 
-console.log = function () {
-  const msg = Array.from(arguments).map(arg => typeof arg === 'object' ? JSON.stringify(arg) : arg).join(' ');
-  logStream.write(`${new Date().toISOString()} - ${msg} \n`);
-  process.stdout.write(`${new Date().toISOString()} - ${msg} \n`);
-};
+// console.log = function () {
+//   const msg = Array.from(arguments).map(arg => typeof arg === 'object' ? JSON.stringify(arg) : arg).join(' ');
+//   logStream.write(`${new Date().toISOString()} - ${msg} \n`);
+//   process.stdout.write(`${new Date().toISOString()} - ${msg} \n`);
+// };
 
-console.error = function () {
-  const msg = Array.from(arguments).map(arg => typeof arg === 'object' ? JSON.stringify(arg) : arg).join(' ');
-  logStream.write(`${new Date().toISOString()} -  ERROR: ${msg} \n`);
-  process.stderr.write(`${new Date().toISOString()} -  ERROR: ${msg} \n`);
-};
+// console.error = function () {
+//   const msg = Array.from(arguments).map(arg => typeof arg === 'object' ? JSON.stringify(arg) : arg).join(' ');
+//   logStream.write(`${new Date().toISOString()} -  ERROR: ${msg} \n`);
+//   process.stderr.write(`${new Date().toISOString()} -  ERROR: ${msg} \n`);
+// };
 
-console.info = function () {
-  const msg = Array.from(arguments).map(arg => typeof arg === 'object' ? JSON.stringify(arg) : arg).join(' ');
-  logStream.write(`${new Date().toISOString()} -  INFO: ${msg} \n`);
-  process.stdout.write(`${new Date().toISOString()} -  INFO: ${msg} \n`);
-};
+// console.info = function () {
+//   const msg = Array.from(arguments).map(arg => typeof arg === 'object' ? JSON.stringify(arg) : arg).join(' ');
+//   logStream.write(`${new Date().toISOString()} -  INFO: ${msg} \n`);
+//   process.stdout.write(`${new Date().toISOString()} -  INFO: ${msg} \n`);
+// };
 
-console.warn = function () {
-  const msg = Array.from(arguments).map(arg => typeof arg === 'object' ? JSON.stringify(arg) : arg).join(' ');
-  logStream.write(`${new Date().toISOString()} -  WARN: ${msg} \n`);
-  process.stdout.write(`${new Date().toISOString()} -  WARN: ${msg} \n`);
-};
+// console.warn = function () {
+//   const msg = Array.from(arguments).map(arg => typeof arg === 'object' ? JSON.stringify(arg) : arg).join(' ');
+//   logStream.write(`${new Date().toISOString()} -  WARN: ${msg} \n`);
+//   process.stdout.write(`${new Date().toISOString()} -  WARN: ${msg} \n`);
+// };

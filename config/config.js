@@ -18,10 +18,13 @@ const config = {
   secretAccessKey_s3: process.env.AWS_SECRET_KEY,
   conecktaStagingPrivateKey: process.env.CONEKTA_STAGING_PRIVATEKEY,
   stripePrivateKey: process.env.STRIPE_PRIVATE_KEY,
+  endpointSecret: process.env.STRIPE_ENDPOINT_SECRET,
   sendGridApiKey: process.env.SENDGRID_API_KEY,
   emailFrom: process.env.EMAIL_FROM,
   tokenSecretSkydropx: process.env.TOKEN_SECRET_SKYDROPX,
   tokenSecretSkydropxDemo: process.env.TOKEN_SECRET_SKYDROPX_DEMO,
+  fApiKey: process.env.F_API_KEY,
+  fApiSecret: process.env.F_SECRET_KEY,
 };
 
 module.exports = { config };

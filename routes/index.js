@@ -10,6 +10,7 @@ const stipeRouter = require('./payment.router');
 const customerAddressRouter = require('./customerAddress.router');
 const couponRouter = require('./coupon.router');
 const codePostalRouter = require('./codePostal.router');
+const invoicesRouter = require('./invoices.router');
 
 const routerApi = (app) => {
   const router = express.Router();
@@ -25,6 +26,7 @@ const routerApi = (app) => {
   router.use('/customerAddress', customerAddressRouter);
   router.use('/coupon', couponRouter);
   router.use('/codePostal', codePostalRouter);
+  router.use('/invoices', invoicesRouter);
 };
 
 module.exports = routerApi;
