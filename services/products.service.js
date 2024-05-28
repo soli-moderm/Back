@@ -546,6 +546,16 @@ class ProductsService {
       searchString
     );
 
+    let searchWords = searchString.split(' ');
+
+    let searchConditions = searchWords.map((word) => {
+      return {
+        name: {
+          [Op.iLike]: '%' + word + '%',
+        },
+      };
+    });
+
     const optionsCategory = query?.categoryName
       ? { name: query?.categoryName }
       : {};
@@ -581,7 +591,7 @@ class ProductsService {
         },
       ],
       where: {
-        name: { [Op.iLike]: `%${searchString}%` },
+        [Op.or]: searchConditions
       },
     };
 
@@ -596,7 +606,7 @@ class ProductsService {
         },
       ],
       where: {
-        name: { [Op.iLike]: `%${searchString}%` },
+        [Op.or]: searchConditions
       },
     };
 
