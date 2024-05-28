@@ -59,8 +59,8 @@ class AuthService {
     return { token, user };
   }
 
-  async me(token) {
-    const payload = jwt.verify(token, config.jwtSecret);
+  async me(oldToken) {
+    const payload = jwt.verify(oldToken, config.jwtSecret);
 
     console.log(
       '🚀 ~ file: auth.service.js ~ line 42 ~ AuthService ~ me ~ payload',
@@ -71,8 +71,10 @@ class AuthService {
       '🚀 ~ file: auth.service.js ~ line 43 ~ AuthService ~ me ~ user',
       user
     );
-    const newToken = this.signToken(user).token;
-    return { user, token: newToken };
+    const result = await this.signToken(user);
+    console.log(result);
+    const { token } = result;
+    return { user, token };
   }
 
   async sendRecovery(email) {
