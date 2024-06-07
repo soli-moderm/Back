@@ -3,7 +3,7 @@ const router = express.Router();
 
 const { config } = require('../config/config');
 
-const shipmentService = require('../services/shipment.service');
+const shipmentService = require('../services/shipments.service');
 
 const service = new shipmentService();
 
