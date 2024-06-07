@@ -209,10 +209,7 @@ class ShipmentsService {
             '🚀 ~ file: shipments.service.js:137 ~ ShipmentsService ~ Shipments.map ~ error:',
             error
           );
-          console.log(
-            '🚀 ~ file: shipments.service.js:137 ~ ShipmentsService ~ Shipments.map ~ error:',
-            error.data.errors
-          );
+         
           errors.push(error);
         }
       })
