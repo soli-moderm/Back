@@ -151,7 +151,7 @@ class ShipmentsService {
           name: company.name,
           zip: company.zipCode,
           country: 'MX',
-          address1:address1from,
+          address1: address1from,
           company: company.CompanyName,
           address2: company.colony,
           phone: company.phone,
@@ -209,6 +209,10 @@ class ShipmentsService {
             '🚀 ~ file: shipments.service.js:137 ~ ShipmentsService ~ Shipments.map ~ error:',
             error
           );
+          console.log(
+            '🚀 ~ file: shipments.service.js:137 ~ ShipmentsService ~ Shipments.map ~ error:',
+            error.data.errors
+          );
           errors.push(error);
         }
       })
@@ -255,7 +259,7 @@ class ShipmentsService {
       })
     );
     console.log('🚀 ~ ShipmentsService ~ createShipment ~ labels:', labels);
-    
+
     // save labels in db
 
     const lasbelsinDB = await Promise.all(
