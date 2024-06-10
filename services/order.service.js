@@ -417,14 +417,8 @@ class OrderService {
         },
         //shipping
         {
-          association: 'Shipments',
+          model: Shipments,
           as: 'shipments',
-          include: [
-            {
-              association: 'order',
-              as: 'order',
-            },
-          ],
         },
         {
           association: 'orderProducts',
