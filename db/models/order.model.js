@@ -130,6 +130,11 @@ class Order extends Model {
       foreignKey: 'orderId',
     });
 
+    this.hasMany(models.Shipments, {
+      as: 'shipments',
+      foreignKey: 'orderId',
+    });
+
     this.belongsTo(models.CustomerAddress, {
       as: 'address',
     });
