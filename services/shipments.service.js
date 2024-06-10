@@ -169,7 +169,7 @@ class ShipmentsService {
           address2: CustomerAddress.colony,
           phone: CustomerAddress.customer.phone,
           email: CustomerAddress.customer.user.email,
-          reference: CustomerAddress.additionalIndications,
+          reference: CustomerAddress.additionalIndications.substring(0, 25),
         },
         consignment_note_class_code: productParcel.consignment_note_class_code,
         consignment_note_packaging_code:
@@ -207,7 +207,7 @@ class ShipmentsService {
         } catch (error) {
           console.log(
             '🚀 ~ file: shipments.service.js:137 ~ ShipmentsService ~ Shipments.map ~ error:',
-            error
+            error.response.data
           );
          
           errors.push(error);

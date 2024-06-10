@@ -415,6 +415,17 @@ class OrderService {
             attributes: ['id', 'email'],
           },
         },
+        //shipping
+        {
+          association: 'Shipments',
+          as: 'shipments',
+          include: [
+            {
+              association: 'order',
+              as: 'order',
+            },
+          ],
+        },
         {
           association: 'orderProducts',
           include: [
