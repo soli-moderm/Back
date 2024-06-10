@@ -417,7 +417,7 @@ class OrderService {
         },
         //shipping
         {
-          model: Shipments,
+          association: 'shipments',
           as: 'shipments',
         },
         {
