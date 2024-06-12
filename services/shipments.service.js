@@ -2,6 +2,7 @@ const axios = require('axios');
 const { config } = require('../config/config');
 const { models } = require('../libs/sequelize');
 const { array, object } = require('joi');
+const { typeStatusOrder } = require('../utils/typeStatus');
 
 const favoriteNameProvider = [
   'DHL',
@@ -144,6 +145,7 @@ class ShipmentsService {
     const Shipments = productsParcels.map((productParcel) => {
       const address1from = `${company.street} ${company.outdoorNumber}`;
       const address1to = `${CustomerAddress.street} ${CustomerAddress.outdoorNumber}`;
+      const nameCustomer = `${CustomerAddress.customer.name} ${CustomerAddress.customer.lastName}`;
       return {
         address_from: {
           province: company.state,
@@ -161,11 +163,11 @@ class ShipmentsService {
         address_to: {
           province: CustomerAddress.state,
           city: CustomerAddress.municipality,
-          name: CustomerAddress.name,
+          name: nameCustomer,
           zip: CustomerAddress.zipCode,
           country: 'MX',
           address1: address1to,
-          company: CustomerAddress.company,
+          company: CustomerAddress.company ? CustomerAddress.company : '-',
           address2: CustomerAddress.colony,
           phone: CustomerAddress.customer.phone,
           email: CustomerAddress.customer.user.email,
@@ -209,7 +211,7 @@ class ShipmentsService {
             '🚀 ~ file: shipments.service.js:137 ~ ShipmentsService ~ Shipments.map ~ error:',
             error.response.data
           );
-         
+
           errors.push(error);
         }
       })
@@ -277,6 +279,17 @@ class ShipmentsService {
         return newLabel;
       })
     );
+
+    await models.Order.update(
+      { status: typeStatusOrder.LISTA_PARA_ENVIAR },
+      { where: { id: order.id } }
+    ).catch((error) => boom.badRequest(error));
+
+    await models.OrderStatusHistory.create({
+      orderId: order.id,
+      status: typeStatusOrder.LISTA_PARA_ENVIAR,
+    }).catch((error) => boom.badRequest(error));
+    
     console.log(
       '🚀 ~ ShipmentsService ~ createShipment ~ lasbelsinDB:',
       lasbelsinDB

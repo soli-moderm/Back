@@ -454,6 +454,26 @@ class OrderService {
     return { id };
   }
 
+  async changeStatusOrder(data) {
+    const { orderId, status } = data;
+    const order = await models.Order.findByPk(orderId).catch((error) => {
+      return boom.badRequest(error);
+    });
+
+    const newStatus = await models.OrderStatusHistory.create({
+      orderId: order.id,
+      status,
+    }).catch((error) => boom.badRequest(error));
+
+    const newSatusOrder = await order
+      .update({
+        status,
+      })
+      .catch((error) => boom.badRequest(error));
+
+    return newStatus;
+  }
+
   async applicationOrderCoupon(data) {
     const { orderId, couponName } = data;
 

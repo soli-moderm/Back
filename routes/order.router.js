@@ -117,4 +117,16 @@ router.post('/applicationOrderCoupon', async (req, res, next) => {
   }
 });
 
+//changeStatusOrder
+router.post('/changeStatusOrder', async (req, res, next) => {
+  try {
+    const body = req.body;
+    const data = await service.changeStatusOrder(body);
+
+    sedResponseSuccess(res, 201, 'Status Cambiado', data);
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;
