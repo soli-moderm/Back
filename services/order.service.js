@@ -2,7 +2,6 @@ const boom = require('@hapi/boom');
 
 const { models } = require('../libs/sequelize');
 const { Op } = require('sequelize');
-const conekta = require('conekta');
 const { config } = require('../config/config');
 
 const { typeStatusOrder } = require('../utils/typeStatus');
@@ -138,7 +137,7 @@ class OrderService {
         colony,
         street,
         outdoorNumber: Number(outdoorNumber),
-        interiorNumber: Number(outdoorNumber),
+        interiorNumber: Number(interiorNumber),
         betweenStreetOne,
         betweenStreetTwo,
         phoneContact: phone.toString(),
@@ -240,26 +239,6 @@ class OrderService {
     } catch (error) {
       return boom.badRequest(error);
     }
-
-    // send email whit sendgrid to customer sendEmailWithTemplate
-
-    sendEmailWithTemplate(
-      'williams1991.rwag@gmail.com',
-      'Orden recibida',
-      'Orden recibida',
-      'd-3754e0d2f1d14f3892e71fe9b0ca18a7',
-      {
-        name: name,
-        lastName: lastName,
-        orderId: newOrder.id,
-        orderStatus: typeStatusOrder.ESPERANDO_CONFIRMACION_DE_PAGO,
-        orderDate: new Date(),
-        orderTotal: newOrder.totalAmount,
-        orderSubtotal: newOrder.subtotalAmount,
-        orderDiscount: newOrder.discountAmount,
-        orderAddress: `${street} ${outdoorNumber} ${interiorNumber} ${colony} ${municipality} ${zipCode}`,
-      }
-    );
 
     return {
       id: newOrder.id,
@@ -456,7 +435,20 @@ class OrderService {
 
   async changeStatusOrder(data) {
     const { orderId, status } = data;
-    const order = await models.Order.findByPk(orderId).catch((error) => {
+    console.log('🚀 ~ OrderService ~ changeStatusOrder ~ orderId:', orderId);
+    const order = await models.Order.findByPk(orderId, {
+      include: [
+        {
+          association: 'customer',
+          as: 'customer',
+          include: {
+            model: models.User,
+            as: 'user',
+            attributes: ['email'],
+          },
+        },
+      ],
+    }).catch((error) => {
       return boom.badRequest(error);
     });
 
@@ -464,6 +456,93 @@ class OrderService {
       orderId: order.id,
       status,
     }).catch((error) => boom.badRequest(error));
+
+    if (status === typeStatusOrder.PEDIDO_EN_CAMINO) {
+      const Shipments = await models.Shipments.findAll({
+        where: {
+          orderId: order.id,
+        },
+      }).catch((error) => boom.badRequest(error));
+
+      const orderProducts = await models.OrderProduct.findAll({
+        where: {
+          orderId: order.id,
+        },
+        include: [
+          {
+            association: 'product',
+            as: 'product',
+            include: {
+              model: models.Product_images,
+              as: 'product_images',
+              attributes: ['filename'],
+            },
+          },
+          {
+            association: 'product_variant',
+          },
+        ],
+      }).catch((error) => boom.badRequest(error));
+
+      const itemsForEmail = orderProducts.map((item) => {
+        const urlImage = `https://www.app.solimoderm.com/api/v1/images/${item.product.product_images[0].filename}`;
+        return {
+          name: item.product.name,
+          price: item.unitPrice,
+          total: item.unitPrice * item.quantity,
+          image: urlImage,
+        };
+      });
+
+      const arrayLabelurl = Shipments.map((shipment) => {
+        if (!shipment.trackingUrlProvider.endsWith(shipment.trackingNumber)) {
+          // Si no termina con el número de seguimiento, agregarlo al final
+          shipment.trackingUrlProvider += shipment.trackingNumber;
+        }
+        return {
+          url: shipment.trackingUrlProvider,
+          trackingNumber: shipment.trackingNumber,
+        };
+      });
+
+      const CustomerAddress = await models.CustomerAddress.findByPk(
+        order.addressId
+      ).catch((error) => boom.badRequest(error));
+      const orderAddress = `${CustomerAddress?.street || ''} #${
+        CustomerAddress?.outdoorNumber || ''
+      } ${CustomerAddress?.interiorNumber || ''} ${
+        CustomerAddress?.colony || ''
+      } ${CustomerAddress?.municipality || ''} ${
+        CustomerAddress?.zipCode || ''
+      }`;
+
+      const email = order.customer.user.email;
+      const { name, lastName } = order.customer;
+
+      const { status, totalAmount, discountAmount, subtotalAmount } = order;
+
+      const dataObject = {
+        name: name,
+        lastName: lastName,
+        email: email,
+        items: itemsForEmail,
+        orderId: order.id,
+        orderAddress: orderAddress,
+        status: status,
+        orderTotal: totalAmount,
+        orderDiscount: discountAmount,
+        orderSubTotal: subtotalAmount,
+        arrayLabelUrl: arrayLabelurl,
+      };
+
+      await sendEmailWithTemplate(
+        email,
+        '¡Tu pedido está en camino! 🚚',
+        '¡Tu pedido está en camino! 🚚',
+        'd-86fdd224d31c4c94ab3055c288b578e2',
+        dataObject
+      );
+    }
 
     const newSatusOrder = await order
       .update({

@@ -20,8 +20,6 @@ router.post(
       const payload = req.body;
       const sig = req.headers['stripe-signature'];
 
-      console.log('🚀 ~ file: stripe.router.js:17 ~ router.post ~ sig:', sig);
-
       let event = null;
 
       try {
@@ -53,13 +51,14 @@ router.post(
           console.log('⏳ Payment requires action:', intent.id);
           service.paymentRequiresAction(intent);
           break;
-        case 'payment_intent.payment_failed':
+        case 'payment_intent.payment_failed': {
           intent = event.data.object;
           service.paymentFailed(intent);
           const message =
             intent.last_payment_error && intent.last_payment_error.message;
           console.log(' 🚫 Failed:', intent.id, message);
           break;
+        }
       }
 
       // If the signature verification succeeds, respond with a 2xx status code.

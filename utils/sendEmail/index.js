@@ -28,6 +28,7 @@ const sendEmailWithTemplate = async (
   templateId,
   dynamicTemplateData
 ) => {
+  console.log('🚀 ~ dynamicTemplateData:', dynamicTemplateData);
   const msg = {
     to: email,
     from: config.emailFrom,
