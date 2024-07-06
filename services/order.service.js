@@ -9,6 +9,10 @@ const { Coupon } = require('../db/models/coupon.model');
 const paginate = require('../utils/paginate');
 const { application } = require('express');
 const { sendEmailWithTemplate } = require('../utils/sendEmail');
+const {
+  SHIPPING_COST_BELOW_MINIMUM,
+  MINIMUM_PURCHASE_AMOUNT,
+} = require('../utils/constants');
 
 const stripe = require('stripe')(config.stripePrivateKey);
 
@@ -63,6 +67,18 @@ const calculateOrderSubtotalAmount = (items) => {
     const itemAmount = unitPriceSubtotalAmount(item) * item.qty;
     return itemAmount + totalAmount;
   }, 0);
+};
+
+const calculateDiscountAmount = (
+  isMinimumPurchase,
+  subtotalAmount,
+  totalAmount
+) => {
+  let discountAmount = subtotalAmount - totalAmount;
+  if (isMinimumPurchase) {
+    discountAmount += SHIPPING_COST_BELOW_MINIMUM;
+  }
+  return discountAmount;
 };
 
 class OrderService {
@@ -151,8 +167,15 @@ class OrderService {
       );
     }
 
-    const totalAmount = calculateOrderAmount(data.cartList);
+    let totalAmount = calculateOrderAmount(data.cartList);
     const subtotalAmount = calculateOrderSubtotalAmount(data.cartList);
+    let isMinimumPurchase = false;
+
+    if (totalAmount < MINIMUM_PURCHASE_AMOUNT) {
+      totalAmount += SHIPPING_COST_BELOW_MINIMUM;
+      isMinimumPurchase = true;
+    }
+
     console.log(
       '🚀 ~ file: order.service.js:156 ~ OrderService ~ create ~ subtotalAmount:',
       subtotalAmount
@@ -193,11 +216,19 @@ class OrderService {
       paymentId: newPaymentDetail.id,
       addressId: idAddress ? idAddress : newAddressCustomer.id,
       subtotalAmount: subtotalAmount,
-      discountAmount: subtotalAmount - totalAmount,
+      discountAmount: calculateDiscountAmount(
+        isMinimumPurchase,
+        subtotalAmount,
+        totalAmount
+      ),
     };
 
     if (data?.coupon) {
       orderObject.couponId = data?.coupon.id;
+    }
+
+    if (isMinimumPurchase) {
+      orderObject.shippingCost = SHIPPING_COST_BELOW_MINIMUM;
     }
 
     const newOrder = await models.Order.create(orderObject).catch((error) =>
