@@ -28,6 +28,19 @@ router.get('/productsBestSellers', async (req, res, next) => {
   }
 });
 
+router.get('/findProductAdmin/:id', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const product = await service.findOneAdmin(id);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+    res.json(product);
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.get(
   '/',
   validatorHandler(queryProductSchema, 'query'),
@@ -54,6 +67,16 @@ router.get(
     }
   }
 );
+
+router.get('findProductAdmin/:id', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const product = await service.findOneAdmin(id);
+    res.json(product);
+  } catch (error) {
+    next(error);
+  }
+});
 
 router.get(
   '/category/:categoryName',
@@ -165,6 +188,7 @@ router.delete(
     }
   }
 );
+
 router.post(
   '/deleteProducts',
   validatorHandler(deleteProductSchema, 'body'),
@@ -183,5 +207,21 @@ router.post(
     }
   }
 );
+
+//change status product
+
+router.patch('/changeStatus/:id', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const product = await service.changeStatus(id);
+    res.status(201).send({
+      status: 'success',
+      message: 'Status Product Changed',
+      data: product,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
 
 module.exports = router;

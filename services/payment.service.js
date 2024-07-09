@@ -47,9 +47,64 @@ class paymentService {
           { model: models.Customer, as: 'customer', include: ['user'] },
         ],
       }).catch((error) => boom.badRequest(error));
+
       console.log('🚀 ~ paymentService ~ paymentSucceeded ~ order:', order[0]);
 
       if (order.length > 0) {
+        // Actualizar inventario de productos
+
+        const orderProducts = await models.OrderProduct.findAll({
+          where: { orderId: order[0].id },
+        }).catch((error) => boom.badRequest(error));
+
+        orderProducts.forEach(async (item) => {
+          if (item.product_variant_id) {
+            const productVariant = await models.ProductVariant.findOne({
+              where: { id: item.product_variant_id },
+            }).catch((error) => boom.badRequest(error));
+
+            const newStock = productVariant.stock - item.quantity;
+
+            if (newStock === 0) {
+              await models.ProductVariant.update(
+                { stock: newStock, status: false },
+                {
+                  where: { id: item.product_variant_id },
+                }
+              ).catch((error) => boom.badRequest(error));
+            } else {
+              await models.ProductVariant.update(
+                { stock: newStock },
+                {
+                  where: { id: item.product_variant_id },
+                }
+              ).catch((error) => boom.badRequest(error));
+            }
+          } else {
+            const product = await models.Product.findOne({
+              where: { id: item.productId },
+            }).catch((error) => boom.badRequest(error));
+
+            const newStock = product.stock - item.quantity;
+
+            if (newStock === 0) {
+              await models.Product.update(
+                { stock: newStock, status: false },
+                {
+                  where: { id: item.productId },
+                }
+              ).catch((error) => boom.badRequest(error));
+            } else {
+              await models.Product.update(
+                { stock: newStock },
+                {
+                  where: { id: item.productId },
+                }
+              ).catch((error) => boom.badRequest(error));
+            }
+          }
+        });
+
         const orderUpdate = await models.Order.update(
           { status: typeStatusOrder.PAGADA },
           {

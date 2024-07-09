@@ -1,5 +1,5 @@
 const faker = require('faker');
-const { Op } = require('sequelize');
+const { Op, where } = require('sequelize');
 const boom = require('@hapi/boom');
 const { uploadFile, getFileStream, getBuckets } = require('../utils/s3');
 
@@ -158,6 +158,7 @@ class ProductsService {
       ],
       where: {
         id: [1, 9, 10, 11, 5, 15, 12],
+        status: true,
       },
     };
 
@@ -167,6 +168,44 @@ class ProductsService {
   }
 
   async findOne(id) {
+    const options = {
+      include: [
+        {
+          model: models.Category,
+          as: 'category',
+          attributes: ['id'],
+        },
+        {
+          model: models.Product_images,
+          as: 'product_images',
+          attributes: ['filename'],
+        },
+        {
+          model: models.Product_variant,
+          as: 'product_variant',
+          attributes: [
+            'id',
+            'name',
+            'price',
+            'promotionalPrice',
+            'stock',
+            'status',
+          ],
+        },
+      ],
+      where: {
+        id: id,
+        status: true,
+      },
+    };
+    const product = await models.Product.findOne(options);
+    if (!product) {
+      throw boom.notFound('product not found');
+    }
+    return product;
+  }
+
+  async findOneAdmin(id) {
     const options = {
       include: [
         {
@@ -207,7 +246,7 @@ class ProductsService {
     let Product = {};
 
     const {
-      status = true,
+      status,
       name,
       description,
       price,
@@ -471,6 +510,9 @@ class ProductsService {
           ],
         },
       ],
+      where: {
+        status: true,
+      },
     };
 
     const { limit, offset } = paginate(page, pageSize);
@@ -523,6 +565,7 @@ class ProductsService {
       ],
       where: {
         [Op.not]: [{ id: idNot }],
+        status: true,
       },
     };
 
@@ -591,7 +634,8 @@ class ProductsService {
         },
       ],
       where: {
-        [Op.or]: searchConditions
+        [Op.or]: searchConditions,
+        status: true,
       },
     };
 
@@ -606,7 +650,8 @@ class ProductsService {
         },
       ],
       where: {
-        [Op.or]: searchConditions
+        [Op.or]: searchConditions,
+        status: true,
       },
     };
 
@@ -654,6 +699,16 @@ class ProductsService {
     const count = await models.Product.count();
 
     return { data: products, count, categoryInSearch };
+  }
+
+  async changeStatus(id) {
+    const product = await this.findOneAdmin(id);
+    if (!product) {
+      throw boom.notFound('product not found');
+    }
+    const status = product.status ? false : true;
+    await product.update({ status });
+    return { id, status };
   }
 }
 
