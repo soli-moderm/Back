@@ -11,12 +11,12 @@ router.post('/', async (req, res, next) => {
     const emailContact = 'solimodermcontacto@gmail.com';
 
     const text = `
-    🚀Tienes un nuevo contacto desde la tienda en línea Solimoderm:
-    Nombre: ${name}
-    Email: ${email}
-    Teléfono: ${phone}
-    Ciudad: ${city}
-    Mensaje: ${message}
+    🚀Tienes un nuevo contacto desde la tienda en línea Solimoderm:\n
+    **Nombre:** ${name}\n
+    **Email:** ${email}\n
+    **Teléfono:** ${phone}\n
+    **Ciudad:** ${city}\n
+    **Mensaje:** ${message}\n
     `;
 
     const subject = 'Nuevo contacto desde la 🛒 Tienda en lines Solimoderm';
