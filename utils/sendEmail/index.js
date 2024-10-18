@@ -5,13 +5,13 @@ const { config } = require('../../config/config');
 
 sgMail.setApiKey(config.sendGridApiKey);
 
-const sendEmail = async (email, subject, text) => {
+const sendEmail = async (email, subject, text, html) => {
   const msg = {
     to: email,
     from: config.emailFrom,
     subject: subject,
     text: text,
-    html: text,
+    html: html,
   };
   try {
     await sgMail.send(msg);
